@@ -1,0 +1,93 @@
+---
+title: "Temperature Humidity"
+author: "Anna Talucci"
+date: '2023-01-07'
+output: html_document
+---
+
+# Overview
+
+# Packages
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+
+# Data
+```{r}
+hgoff = read.csv("../data/decagon_data/hg_off/HGOFF2Jan23-1609-all.csv", header=TRUE, sep = ",", strip.white = TRUE)
+```
+
+# Check data
+```{r}
+head(hgoff)
+```
+# Clean
+```{r}
+hgoff1 = hgoff %>% 
+  dplyr::rename(datetime = HGOFF, vwc1 = Port.1, temp1 = Port.1.1, ec1 = Port.1.2,vwc2 = Port.2, temp2 = Port.2.1, ec2 = Port.2.2, vwc3 = Port.3, temp3 = Port.3.1, ec3 = Port.3.2, vwc4 = Port.4, temp4 = Port.4.1, ec4 = Port.4.2, rh=Port.5, airtemp = Port.5.1) %>%
+   mutate(across(where(is.character), ~na_if(., "#N/A")))
+```
+
+```{r}
+hgoff1 <- hgoff1[-c(1:2),]
+```
+
+```{r}
+hgoff1
+```
+# Select Surface variables
+
+```{r}
+hgoff2 = hgoff1 %>% 
+  dplyr::select(datetime, rh, airtemp) %>% 
+  drop_na(.) %>% 
+  type_convert() %>%
+  tidyr::separate(., datetime, c("date", "time", "ampm"), sep = " ")
+```
+```{r}
+str(hgoff2)
+```
+
+```{r}
+hgoff2
+```
+
+```{r}
+hgoff2 <- hgoff2[-c(1:2),]
+```
+
+```{r}
+hgoff2$date <- lubridate::mdy(hgoff2$date)
+```
+# Summarize
+```{r}
+hgoff2 %>%
+  summarise(rh_min =min(rh),
+            rh_max = max(rh),
+            temp_min = min(airtemp),
+            temp_max = max(airtemp))
+```
+
+```{r}
+hgoff3 = hgoff2 %>% 
+  group_by(date) %>%
+  summarise(rh_min =min(rh),
+            rh_mean = mean(rh),
+            rh_max = max(rh),
+            temp_min = min(airtemp),
+            temp_mean = mean(airtemp),
+            temp_max = max(airtemp))
+  
+```
+
+```{r}
+hgoff3
+```
+
+
+# Plot
+```{r}
+ggplot(hgoff3, aes(x=date, y=temp_mean)) +
+  geom_line()
+```
