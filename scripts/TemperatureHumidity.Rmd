@@ -464,7 +464,7 @@ meanOnsub
 theme_reg = theme_bw() + theme(legend.position = "none") +
   theme(plot.margin = unit(c(t = 0.3, r = 0.3, b = 0.3, l = 0.3), "cm")) +
   theme(axis.title.x = element_text(size = 9),
-        axis.title.y = element_text(size = 9, hjust = 0, vjust = 0),
+        axis.title.y = element_text(size = 9, hjust = 0.5, vjust = 0.5),
         axis.text.x = element_text(size = 7, color = "black"),
         axis.text.y = element_text(size = 7, color = "black"),
         panel.background = element_blank(), 
@@ -483,51 +483,56 @@ theme_legend = theme_bw() + theme(legend.position = "bottom") +
 
 ## Define Labels
 ```{r}
-ecUnits = "Electrocal conductivity (mS/cm)" 
-vwcUnits = "Moisture (m³/m³)" 
+ecUnits = "Electrocal conductivity\n(mS/cm)" 
+vwcUnits = "Moisture\n(m³/m³)" 
+tempUnits =  "Temperature\n(°C)"
 tempLab <- "Temperature (°C)"
 rhLab = "Relative humidity (%)"
 ```
 
 ## Off Track
+scale_fill_manual(values = alpha(c("blue", "red"), .3))
 
 ### Surface 
-#### Mean daily temperature
+#### Temperature daily mean
+"A" = "#a1dab4","B"="#253494"
 ```{r}
 ( plot1 <- ggplot(NULL, aes(x=date, y=airtemp)) + 
-      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21, alpha=.5) +
       geom_line(data = meanOffsurface, aes(color="B"), ) +
   labs(x="Date", y=tempLab, caption = "Off track") +
-    scale_color_manual(values = c("A" = "#a1dab4","B"="#253494"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
   theme_reg
   )
 ```
 
 ```{r}
 ( legend_temp <- ggplot(NULL, aes(x=date, y=airtemp)) + 
-      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21, alpha=.5) +
       geom_line(data = meanOffsurface, aes(color="B"), size=2) +
   labs(x="Date", y=tempLab) +
-    scale_color_manual(values = c("A" = "#a1dab4","B"="#253494"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
   theme_legend
   )
 ```
 #### Mean RH
+#99d8c9
+#2ca25f
 ```{r}
 ( plot2 <- ggplot(NULL, aes(x=date, y=rh)) + 
-      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21, alpha=.5) +
       geom_line(data = meanOffsurface, aes(color="B")) +
   labs(x="Date", y=rhLab, caption = "Off track") +
-    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+    scale_color_manual(values = c("A" = "#99d8c9","B"="#2ca25f"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
   theme_reg
   )
 ```
 ```{r}
 ( legend_rh <- ggplot(NULL, aes(x=date, y=rh)) + 
-      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
-      geom_line(data = meanOffsurface, aes(color="B")) +
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21, alpha=.5) +
+      geom_line(data = meanOffsurface, aes(color="B"), size=2) +
   labs(x="Date", y=rhLab, caption = "Off track") +
-    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+    scale_color_manual(values = c("A" = "#99d8c9","B"="#2ca25f"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
   theme_legend
   )
 ```
@@ -565,7 +570,7 @@ rhLab = "Relative humidity (%)"
       geom_line(data = meanOffsub, aes(x=date, y=temp2, color="B")) +
       geom_line(data = meanOffsub, aes(x=date, y=temp3, color="C")) +
       geom_line(data = meanOffsub, aes(x=date, y=temp4, color="D")) +
-  labs(x="Date", y=tempLab, caption = "Vertical profile off track") +
+  labs(x="Date", y=tempUnits, caption = "Vertical profile off track") +
      scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
   theme_reg
  )
@@ -587,13 +592,13 @@ rhLab = "Relative humidity (%)"
 ## On Track
 
 ### Surface 
-#### Mean daily temperature
+#### Temperature mean daily
 ```{r}
 ( plot6 <- ggplot(NULL, aes(x=date, y=airtemp)) + 
-      geom_point(data = surfaceOn2, aes(color="A"), shape=21) +
+      geom_point(data = surfaceOn2, aes(color="A"), shape=21, alpha=.5) +
       geom_line(data = meanOnsurface, aes(color="B")) +
   labs(x="Date", y=tempLab, caption = "On track") +
-    scale_color_manual(values = c("A" = "#a1dab4","B"="#253494"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
   theme_reg
   )
 ```
@@ -601,10 +606,10 @@ rhLab = "Relative humidity (%)"
 #### Mean RH
 ```{r}
 ( plot7 <- ggplot(NULL, aes(x=date, y=rh)) + 
-      geom_point(data = surfaceOn2, aes(color="A"), shape=21) +
+      geom_point(data = surfaceOn2, aes(color="A"), shape=21, alpha=.5) +
       geom_line(data = meanOnsurface, aes(color="B")) +
   labs(x="Date", y=rhLab, caption = "On track") +
-    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+    scale_color_manual(values = c("A" = "#99d8c9","B"="#2ca25f"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
   theme_reg
   )
 ```
@@ -632,7 +637,7 @@ rhLab = "Relative humidity (%)"
       geom_line(data = meanOnsub, aes(x=date, y=temp2, color="B")) +
       geom_line(data = meanOnsub, aes(x=date, y=temp3, color="C")) +
       geom_line(data = meanOnsub, aes(x=date, y=temp4, color="D")) +
-  labs(x="Date", y=tempLab, caption = "Vertical profile on track") +
+  labs(x="Date", y=tempUnits, caption = "Vertical profile on track") +
      scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
   theme_reg
  )
@@ -667,7 +672,7 @@ combineLegend <- cowplot::plot_grid(
 ```
 
 ```{r}
-( g1 = cowplot::plot_grid(plot1, plot6, plot2,plot7, ncol=2, labels = "auto")
+( g1 = cowplot::plot_grid(plot1,plot2, plot6, plot7, ncol=2, labels = "auto")
   )
 ```
 
@@ -677,7 +682,13 @@ combineLegend <- cowplot::plot_grid(
 ```
 
 ```{r eval=FALSE, include=FALSE}
-ggsave("../figures/SurfaceMeasures.tiff", plot = g1, width = 6, height =5, units = c("in"), dpi=600, bg = "white" )
+ggsave("../figures/SurfaceMeasures.tiff", plot = g1.1, width = 6, height =5, units = c("in"), dpi=600, bg = "white" )
+```
+
+## Subsurface
+
+```{r}
+sub_leg = get_legend(legend_sub)
 ```
 
 ```{r fig.height=7, fig.width=6}
@@ -685,6 +696,11 @@ ggsave("../figures/SurfaceMeasures.tiff", plot = g1, width = 6, height =5, units
   )
 ```
 
+```{r}
+( g2.1 = cowplot::plot_grid(g2, sub_leg, ncol = 1, rel_heights = c(1, .05))
+)
+```
+
 ```{r eval=FALSE, include=FALSE}
-ggsave("../figures/VerticalProfileMeasures.tiff", plot = g2, width = 6, height =7, units = c("in"), dpi=600, bg = "white" )
+ggsave("../figures/VerticalProfileMeasures.tiff", plot = g2.1, width = 6, height =7, units = c("in"), dpi=600, bg = "white" )
 ```
