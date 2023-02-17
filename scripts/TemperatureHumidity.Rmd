@@ -1,16 +1,22 @@
 ---
-title: "Temperature Humidity"
+title: "HG on and off Track"
 author: "Anna Talucci"
 date: '2023-01-07'
 output: html_document
 ---
 
 # Overview
+Here we explore the off and on track data for the water track at Howard Glacier. 
+
 
 # Packages
 ```{r}
 library(tidyverse)
 library(lubridate)
+library(gt)
+library(gtsummary)
+library(skimr)
+library(cowplot)
 ```
 
 # Data
@@ -18,76 +24,667 @@ library(lubridate)
 hgoff = read.csv("../data/decagon_data/hg_off/HGOFF2Jan23-1609-all.csv", header=TRUE, sep = ",", strip.white = TRUE)
 ```
 
+```{r}
+hgon = read.csv("../data/decagon_data/hg_on/HG_on_V2Jan23-1602-all.csv", header=TRUE, sep = ",", strip.white = TRUE)
+```
+
 # Check data
 ```{r}
 head(hgoff)
 ```
-# Clean
+
 ```{r}
-hgoff1 = hgoff %>% 
+head(hgon)
+```
+
+# Clean
+
+## Off track
+
+### Surface data
+Rename columns, and convert NAs to NA.
+```{r}
+surfaceOff1 = hgoff %>% 
   dplyr::rename(datetime = HGOFF, vwc1 = Port.1, temp1 = Port.1.1, ec1 = Port.1.2,vwc2 = Port.2, temp2 = Port.2.1, ec2 = Port.2.2, vwc3 = Port.3, temp3 = Port.3.1, ec3 = Port.3.2, vwc4 = Port.4, temp4 = Port.4.1, ec4 = Port.4.2, rh=Port.5, airtemp = Port.5.1) %>%
    mutate(across(where(is.character), ~na_if(., "#N/A")))
 ```
 
+#### Remove first 2 rows
 ```{r}
-hgoff1 <- hgoff1[-c(1:2),]
+surfaceOff1 <- surfaceOff1[-c(1:2),]
 ```
 
 ```{r}
-hgoff1
+surfaceOff1
 ```
-# Select Surface variables
+
+#### Select air temperature and relative humidity
 
 ```{r}
-hgoff2 = hgoff1 %>% 
+surfaceOff2 = surfaceOff1 %>% 
   dplyr::select(datetime, rh, airtemp) %>% 
+  drop_na(.) %>% 
+  type_convert() %>%
+  tidyr::separate(., datetime, c("date", "time", "ampm"), sep = " ") %>%
+  mutate(rh=rh*100) 
+```
+```{r}
+str(surfaceOff2)
+```
+
+```{r}
+surfaceOff2
+```
+#### Remove the fisrt 2 rows with wierd values
+```{r}
+surfaceOff2 <- surfaceOff2[-c(1:2),]
+```
+
+
+#### Covert to date
+```{r}
+surfaceOff2$date <- lubridate::mdy(surfaceOff2$date)
+```
+
+```{r}
+surfaceOff2
+```
+
+### Subsurface data
+Rename columns, and convert NAs to NA.
+```{r}
+subOff1 = hgoff %>% 
+  dplyr::rename(datetime = HGOFF, vwc1 = Port.1, temp1 = Port.1.1, ec1 = Port.1.2,vwc2 = Port.2, temp2 = Port.2.1, ec2 = Port.2.2, vwc3 = Port.3, temp3 = Port.3.1, ec3 = Port.3.2, vwc4 = Port.4, temp4 = Port.4.1, ec4 = Port.4.2, rh=Port.5, airtemp = Port.5.1) %>%
+   mutate(across(where(is.character), ~na_if(., "#N/A")))
+
+subOff1
+```
+
+#### Remove first 2 rows
+```{r}
+subOff1 <- subOff1[-c(1:2),]
+```
+
+
+#### Select subsurface variables
+
+```{r}
+subOff2 = subOff1 %>% 
+  dplyr::select(datetime, vwc1:ec4) %>% 
   drop_na(.) %>% 
   type_convert() %>%
   tidyr::separate(., datetime, c("date", "time", "ampm"), sep = " ")
 ```
+
 ```{r}
-str(hgoff2)
+str(subOff2)
 ```
 
 ```{r}
-hgoff2
+subOff2
+```
+
+### Covert to date
+```{r}
+subOff2$date <- lubridate::mdy(subOff2$date)
 ```
 
 ```{r}
-hgoff2 <- hgoff2[-c(1:2),]
+subOff2
+```
+
+## On track
+```{r}
+hgon
+```
+### Surface data
+Rename columns, and convert NAs to NA.
+```{r}
+surfaceOn1 = hgon %>% 
+  dplyr::rename(datetime = HG_on_V, vwc1 = Port.1, temp1 = Port.1.1, ec1 = Port.1.2,vwc2 = Port.2, temp2 = Port.2.1, ec2 = Port.2.2, vwc3 = Port.3, temp3 = Port.3.1, ec3 = Port.3.2, vwc4 = Port.4, temp4 = Port.4.1, ec4 = Port.4.2, rh=Port.5, airtemp = Port.5.1) %>%
+   mutate(across(where(is.character), ~na_if(., "#N/A")))
+```
+
+#### Remove first 2 rows
+```{r}
+surfaceOn1 <- surfaceOn1[-c(1:2),]
 ```
 
 ```{r}
-hgoff2$date <- lubridate::mdy(hgoff2$date)
+surfaceOn1
 ```
-# Summarize
+
+#### Select air temperature and relative humidity
+
 ```{r}
-hgoff2 %>%
-  summarise(rh_min =min(rh),
-            rh_max = max(rh),
-            temp_min = min(airtemp),
-            temp_max = max(airtemp))
+surfaceOn2 = surfaceOn1 %>% 
+  dplyr::select(datetime, rh, airtemp) %>% 
+  drop_na(.) %>% 
+  type_convert() %>%
+  tidyr::separate(., datetime, c("date", "time", "ampm"), sep = " ") %>%
+  mutate(rh=rh*100) 
 ```
 
 ```{r}
-hgoff3 = hgoff2 %>% 
+str(surfaceOn2)
+```
+
+```{r}
+surfaceOn2
+```
+
+#### Remove the fisrt 2 rows with wierd values
+```{r}
+surfaceOn2 <- surfaceOn2[-1,]
+```
+
+
+#### Covert to date
+```{r}
+surfaceOn2$date <- lubridate::mdy(surfaceOn2$date)
+```
+
+```{r}
+surfaceOn2
+```
+
+### Subsurface data
+Rename columns, and convert NAs to NA.
+```{r}
+subOn1 = hgon %>% 
+  dplyr::rename(datetime = HG_on_V, vwc1 = Port.1, temp1 = Port.1.1, ec1 = Port.1.2,vwc2 = Port.2, temp2 = Port.2.1, ec2 = Port.2.2, vwc3 = Port.3, temp3 = Port.3.1, ec3 = Port.3.2, vwc4 = Port.4, temp4 = Port.4.1, ec4 = Port.4.2, rh=Port.5, airtemp = Port.5.1) %>%
+   mutate(across(where(is.character), ~na_if(., "#N/A")))
+
+subOn1
+```
+
+#### Remove first 2 rows
+```{r}
+subOn1 <- subOn1[-c(1:2),]
+```
+
+
+#### Select subsurface variables
+
+```{r}
+subOn2 = subOn1 %>% 
+  dplyr::select(datetime, vwc1:ec4) %>% 
+  drop_na(.) %>% 
+  type_convert() %>%
+  tidyr::separate(., datetime, c("date", "time", "ampm"), sep = " ")
+```
+
+```{r}
+str(subOn2)
+```
+
+```{r}
+subOn2
+```
+
+### Covert to date
+```{r}
+subOn2$date <- lubridate::mdy(subOn2$date)
+```
+
+```{r}
+subOn2
+```
+
+
+
+
+# Summary Tables
+
+## Off Track
+
+### Surface off track
+
+```{r}
+( t1 = surfaceOff2 %>% 
+  dplyr::select(rh, airtemp) %>% 
+  tbl_summary(                                     
+    type = all_continuous() ~ "continuous2",       
+    statistic = all_continuous() ~ c(
+      "{mean} ({sd})",                             
+      "{median} ({p25}, {p75})",                   
+      "{min}, {max}"),                            
+    label  = list(rh   ~ "Relative humidity (%)", airtemp ~ "Air Temperature (°C)")) %>%
+  as_gt() %>%
+  gt::tab_header(title = "Howard glacier off track surface",
+                 subtitle = "Summary statistics")
+)
+```
+
+```{r eval=FALSE, include=FALSE}
+gt::gtsave(t1, filename = "../outputs/Tables/HGOffSurface.html")
+```
+
+### Subsurface off track
+
+```{r}
+( t2 = subOff2 %>% 
+  dplyr::select(vwc1, temp1, ec1, vwc2, temp2, ec2, vwc3, temp3, ec3, vwc4, temp4, ec4) %>%                      
+  tbl_summary(                                     
+    type = all_continuous() ~ "continuous2",       
+    statistic = all_continuous() ~ c(
+      "{mean} ({sd})",                             
+      "{median} ({p25}, {p75})",                   
+      "{min}, {max}"),                            
+    label  = list(vwc1  ~ "0cm Moisture (m³/m³)", 
+                  temp1 ~ "0cm Temperature (°C)", 
+                  ec1 ~ "0cm Electrical conductivity (mS/cm)", 
+                  vwc2 ~ "10cm Moisture (m³/m³)", 
+                  temp2 ~ "10cm Temperature (°C)", 
+                  ec2 ~ "10cm Electrical conductivity (mS/cm)", 
+                  vwc3 ~ "20cm Moisture (m³/m³)", 
+                  temp3 ~ "20cm Temperature (°C)", 
+                  ec3 ~ "20cm Electrical conductivity (mS/cm)", 
+                  vwc4 ~ "30cm Moisture (m³/m³)", 
+                  temp4 ~ "30cm Temperature (°C)", 
+                  ec4 ~ "30cm Electrical conductivity (mS/cm)" )) %>%
+  as_gt() %>%
+  gt::tab_header(title = "Howard glacier off track soil profile",
+                 subtitle = "Summary statistics")
+)
+```
+
+```{r eval=FALSE, include=FALSE}
+gt::gtsave(t2, filename = "../outputs/Tables/HGOffSoilProfile.html")
+```
+
+
+
+
+## On Track
+
+### Surface 
+
+```{r}
+( t3 = surfaceOn2 %>% 
+  dplyr::select(rh, airtemp) %>% 
+  tbl_summary(                                     
+    type = all_continuous() ~ "continuous2",       
+    statistic = all_continuous() ~ c(
+      "{mean} ({sd})",                             
+      "{median} ({p25}, {p75})",                   
+      "{min}, {max}"),                            
+    label  = list(rh   ~ "Relative humidity (%)", airtemp ~ "Air Temperature (°C)")) %>%
+  as_gt() %>%
+  gt::tab_header(title = "Howard glacier on track surface",
+                 subtitle = "Summary statistics")
+)
+```
+
+```{r eval=FALSE, include=FALSE}
+gt::gtsave(t3, filename = "../outputs/Tables/HGOnSurface.html")
+```
+
+### Subsurface off track
+
+```{r}
+( t4 = subOn2 %>% 
+  dplyr::select(vwc1, temp1, ec1, vwc2, temp2, ec2, vwc3, temp3, ec3, vwc4, temp4, ec4) %>%                      
+  tbl_summary(                                     
+    type = all_continuous() ~ "continuous2",       
+    statistic = all_continuous() ~ c(
+      "{mean} ({sd})",                             
+      "{median} ({p25}, {p75})",                   
+      "{min}, {max}"),                            
+    label  = list(vwc1  ~ "0cm Moisture (m³/m³)", 
+                  temp1 ~ "0cm Temperature (°C)", 
+                  ec1 ~ "0cm Electrical conductivity (mS/cm)", 
+                  vwc2 ~ "10cm Moisture (m³/m³)", 
+                  temp2 ~ "10cm Temperature (°C)", 
+                  ec2 ~ "10cm Electrical conductivity (mS/cm)", 
+                  vwc3 ~ "20cm Moisture (m³/m³)", 
+                  temp3 ~ "20cm Temperature (°C)", 
+                  ec3 ~ "20cm Electrical conductivity (mS/cm)", 
+                  vwc4 ~ "30cm Moisture (m³/m³)", 
+                  temp4 ~ "30cm Temperature (°C)", 
+                  ec4 ~ "30cm Electrical conductivity (mS/cm)" )) %>%
+  as_gt() %>%
+  gt::tab_header(title = "Howard glacier on track soil profile",
+                 subtitle = "Summary statistics")
+)
+```
+
+```{r eval=FALSE, include=FALSE}
+gt::gtsave(t4, filename = "../outputs/Tables/HGOTSoilProfile.html")
+```
+
+
+# Summary dataframes for plots
+
+## Off track
+### Surface means
+```{r}
+meanOffsurface = surfaceOff2 %>% 
   group_by(date) %>%
   summarise(rh_min =min(rh),
             rh_mean = mean(rh),
             rh_max = max(rh),
             temp_min = min(airtemp),
             temp_mean = mean(airtemp),
-            temp_max = max(airtemp))
+            temp_max = max(airtemp)) %>%
+  dplyr::select(date, rh_mean, temp_mean) %>%
+  rename( rh=rh_mean, airtemp=temp_mean)  
+
+meanOffsurface
+```
+
+### Subsurface means
+
+```{r}
+meanOffsub = subOff2 %>% 
+  group_by(date) %>%
+  summarise(vwc1_mean =mean(vwc1),
+            vwc2_mean =mean(vwc2),
+            vwc3_mean =mean(vwc3),
+            vwc4_mean =mean(vwc4),
+            temp1_mean = mean(temp1),
+            temp2_mean = mean(temp2),
+            temp3_mean = mean(temp3),
+            temp4_mean = mean(temp4),
+            ec1_mean = mean(ec1),
+            ec2_mean = mean(ec2),
+            ec3_mean = mean(ec3),
+            ec4_mean = mean(ec4)) %>%
+  rename( vwc1=vwc1_mean, 
+          vwc2=vwc2_mean,
+          vwc3=vwc3_mean,
+          vwc4=vwc4_mean,
+          temp1=temp1_mean, 
+          temp2=temp2_mean,
+          temp3=temp3_mean,
+          temp4=temp4_mean,
+          ec1=ec1_mean, 
+          ec2=ec2_mean,
+          ec3=ec3_mean,
+          ec4=ec4_mean)
+
+meanOffsub
+```
+
+## On track
+### Surface means
+```{r}
+meanOnsurface = surfaceOn2 %>% 
+  group_by(date) %>%
+  summarise(rh_min =min(rh),
+            rh_mean = mean(rh),
+            rh_max = max(rh),
+            temp_min = min(airtemp),
+            temp_mean = mean(airtemp),
+            temp_max = max(airtemp)) %>%
+  dplyr::select(date, rh_mean, temp_mean) %>%
+  rename( rh=rh_mean, airtemp=temp_mean) 
+
+meanOnsurface
+```
+
+### Subsurface means
+
+```{r}
+meanOnsub = subOn2 %>% 
+  group_by(date) %>%
+  summarise(vwc1_mean =mean(vwc1),
+            vwc2_mean =mean(vwc2),
+            vwc3_mean =mean(vwc3),
+            vwc4_mean =mean(vwc4),
+            temp1_mean = mean(temp1),
+            temp2_mean = mean(temp2),
+            temp3_mean = mean(temp3),
+            temp4_mean = mean(temp4),
+            ec1_mean = mean(ec1),
+            ec2_mean = mean(ec2),
+            ec3_mean = mean(ec3),
+            ec4_mean = mean(ec4)) %>%
+  rename( vwc1=vwc1_mean, 
+          vwc2=vwc2_mean,
+          vwc3=vwc3_mean,
+          vwc4=vwc4_mean,
+          temp1=temp1_mean, 
+          temp2=temp2_mean,
+          temp3=temp3_mean,
+          temp4=temp4_mean,
+          ec1=ec1_mean, 
+          ec2=ec2_mean,
+          ec3=ec3_mean,
+          ec4=ec4_mean)
+
+meanOnsub
+```
+
+
+# Plot 
+
+## Define graph Theme 
+```{r}
+theme_reg = theme_bw() + theme(legend.position = "none") +
+  theme(plot.margin = unit(c(t = 0.3, r = 0.3, b = 0.3, l = 0.3), "cm")) +
+  theme(axis.title.x = element_text(size = 9),
+        axis.title.y = element_text(size = 9, hjust = 0, vjust = 0),
+        axis.text.x = element_text(size = 7, color = "black"),
+        axis.text.y = element_text(size = 7, color = "black"),
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+```
+
+```{r}
+theme_legend = theme_bw() + theme(legend.position = "bottom") +  
+  theme(panel.grid.major = element_blank()) +
+    theme(axis.title.y = element_text(size = 11, hjust = 0.5, vjust = 1.1),
+        axis.text.x = element_text(size = 10, color = "black"),
+        axis.text.y = element_text(size = 10, color = "black"),
+        axis.line = element_line(colour = "black")) +
+  theme(legend.title = element_blank())   
+```
+
+## Define Labels
+```{r}
+ecUnits = "Electrocal conductivity (mS/cm)" 
+vwcUnits = "Moisture (m³/m³)" 
+tempLab <- "Temperature (°C)"
+rhLab = "Relative humidity (%)"
+```
+
+## Off Track
+
+### Surface 
+#### Mean daily temperature
+```{r}
+( plot1 <- ggplot(NULL, aes(x=date, y=airtemp)) + 
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
+      geom_line(data = meanOffsurface, aes(color="B"), ) +
+  labs(x="Date", y=tempLab, caption = "Off track") +
+    scale_color_manual(values = c("A" = "#a1dab4","B"="#253494"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+  theme_reg
+  )
+```
+
+```{r}
+( legend_temp <- ggplot(NULL, aes(x=date, y=airtemp)) + 
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
+      geom_line(data = meanOffsurface, aes(color="B"), size=2) +
+  labs(x="Date", y=tempLab) +
+    scale_color_manual(values = c("A" = "#a1dab4","B"="#253494"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+  theme_legend
+  )
+```
+#### Mean RH
+```{r}
+( plot2 <- ggplot(NULL, aes(x=date, y=rh)) + 
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
+      geom_line(data = meanOffsurface, aes(color="B")) +
+  labs(x="Date", y=rhLab, caption = "Off track") +
+    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+  theme_reg
+  )
+```
+```{r}
+( legend_rh <- ggplot(NULL, aes(x=date, y=rh)) + 
+      geom_point(data = surfaceOff2, aes(color="A"), shape=21) +
+      geom_line(data = meanOffsurface, aes(color="B")) +
+  labs(x="Date", y=rhLab, caption = "Off track") +
+    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+  theme_legend
+  )
+```
+### Subsurface 
+
+#### VWC
+```{r}
+( plot3 <- ggplot() + 
+      geom_line(data = meanOffsub, aes(x=date, y=vwc1, color="A")) +
+      geom_line(data = meanOffsub, aes(x=date, y=vwc2, color="B")) +
+      geom_line(data = meanOffsub, aes(x=date, y=vwc3, color="C")) +
+      geom_line(data = meanOffsub, aes(x=date, y=vwc4, color="D")) +
+  labs(x="Date", y=vwcUnits, caption = "Vertical profile off track") +
+    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+  theme_reg
+ )
+```
+ scale_color_manual(values = c("A" ="#fdae61","B" = "#ff6347", "C" = "#fee08b"), labels = c( "A" ="Tweedsmuir fire","B" = "Entiako fire", "C" = "Chelaslie fire" ), name = "Fire perimeters") +
+
+```{r}
+( legend_sub <- ggplot() + 
+      geom_line(data = meanOffsub, aes(x=date, y=vwc1, color="A")) +
+      geom_line(data = meanOffsub, aes(x=date, y=vwc2, color="B")) +
+      geom_line(data = meanOffsub, aes(x=date, y=vwc3, color="C")) +
+      geom_line(data = meanOffsub, aes(x=date, y=vwc4, color="D")) +
+  labs(x="Date", y=vwcUnits, caption = "Vertical profile off track") +
+    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+  theme_legend
+ )
+```
+#### Temperature
+```{r}
+( plot4 <- ggplot() + 
+      geom_line(data = meanOffsub, aes(x=date, y=temp1, color="A")) +
+      geom_line(data = meanOffsub, aes(x=date, y=temp2, color="B")) +
+      geom_line(data = meanOffsub, aes(x=date, y=temp3, color="C")) +
+      geom_line(data = meanOffsub, aes(x=date, y=temp4, color="D")) +
+  labs(x="Date", y=tempLab, caption = "Vertical profile off track") +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+  theme_reg
+ )
+```
+
+#### EC
+```{r}
+( plot5 <- ggplot() + 
+      geom_line(data = meanOffsub, aes(x=date, y=ec1, color="A")) +
+      geom_line(data = meanOffsub, aes(x=date, y=ec2, color="B")) +
+      geom_line(data = meanOffsub, aes(x=date, y=ec3, color="C")) +
+      geom_line(data = meanOffsub, aes(x=date, y=ec4, color="D")) +
+  labs(x="Date", y=ecUnits, caption = "Vertical profile off track") +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+  theme_reg
+ )
+```
+
+## On Track
+
+### Surface 
+#### Mean daily temperature
+```{r}
+( plot6 <- ggplot(NULL, aes(x=date, y=airtemp)) + 
+      geom_point(data = surfaceOn2, aes(color="A"), shape=21) +
+      geom_line(data = meanOnsurface, aes(color="B")) +
+  labs(x="Date", y=tempLab, caption = "On track") +
+    scale_color_manual(values = c("A" = "#a1dab4","B"="#253494"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+  theme_reg
+  )
+```
+
+#### Mean RH
+```{r}
+( plot7 <- ggplot(NULL, aes(x=date, y=rh)) + 
+      geom_point(data = surfaceOn2, aes(color="A"), shape=21) +
+      geom_line(data = meanOnsurface, aes(color="B")) +
+  labs(x="Date", y=rhLab, caption = "On track") +
+    scale_color_manual(values = c("A" = "#0868ac","B"="#7bccc4"), labels =c("A" ="2 minutes", "B"="Mean daily")) +
+  theme_reg
+  )
+```
+
+### Subsurface 
+
+#### VWC
+```{r}
+( plot8 <- ggplot() + 
+      geom_line(data = meanOnsub, aes(x=date, y=vwc1, color="A")) +
+      geom_line(data = meanOnsub, aes(x=date, y=vwc2, color="B")) +
+      geom_line(data = meanOnsub, aes(x=date, y=vwc3, color="C")) +
+      geom_line(data = meanOnsub, aes(x=date, y=vwc4, color="D")) +
+  labs(x="Date", y=vwcUnits, caption = "Vertical profile on track") +
+    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+  theme_reg
+ )
+```
+ scale_color_manual(values = c("A" ="#fdae61","B" = "#ff6347", "C" = "#fee08b"), labels = c( "A" ="Tweedsmuir fire","B" = "Entiako fire", "C" = "Chelaslie fire" ), name = "Fire perimeters") +
   
+#### Temperature
+```{r}
+( plot9 <- ggplot() + 
+      geom_line(data = meanOnsub, aes(x=date, y=temp1, color="A")) +
+      geom_line(data = meanOnsub, aes(x=date, y=temp2, color="B")) +
+      geom_line(data = meanOnsub, aes(x=date, y=temp3, color="C")) +
+      geom_line(data = meanOnsub, aes(x=date, y=temp4, color="D")) +
+  labs(x="Date", y=tempLab, caption = "Vertical profile on track") +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+  theme_reg
+ )
+```
+
+#### EC
+```{r}
+( plot10 <- ggplot() + 
+      geom_line(data = meanOnsub, aes(x=date, y=ec1, color="A")) +
+      geom_line(data = meanOnsub, aes(x=date, y=ec2, color="B")) +
+      geom_line(data = meanOnsub, aes(x=date, y=ec3, color="C")) +
+      geom_line(data = meanOnsub, aes(x=date, y=ec4, color="D")) +
+  labs(x="Date", y=ecUnits, caption = "Vertical profile on track") +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+  theme_reg
+ )
+```
+
+
+# Combined plots
+## Surface
+```{r}
+temp_leg = get_legend(legend_temp)
+rh_leg = get_legend(legend_rh)
 ```
 
 ```{r}
-hgoff3
+combineLegend <- cowplot::plot_grid(
+  temp_leg,
+  rh_leg,
+  ncol = 2)
 ```
 
-
-# Plot
 ```{r}
-ggplot(hgoff3, aes(x=date, y=temp_mean)) +
-  geom_line()
+( g1 = cowplot::plot_grid(plot1, plot6, plot2,plot7, ncol=2, labels = "auto")
+  )
+```
+
+```{r}
+( g1.1 = cowplot::plot_grid(g1, combineLegend, ncol = 1, rel_heights = c(1, .05))
+)
+```
+
+```{r eval=FALSE, include=FALSE}
+ggsave("../figures/SurfaceMeasures.tiff", plot = g1, width = 6, height =5, units = c("in"), dpi=600, bg = "white" )
+```
+
+```{r fig.height=7, fig.width=6}
+( g2 = cowplot::plot_grid(plot3, plot8, plot4,plot9, plot5, plot10, ncol=2, labels = "auto")
+  )
+```
+
+```{r eval=FALSE, include=FALSE}
+ggsave("../figures/VerticalProfileMeasures.tiff", plot = g2, width = 6, height =7, units = c("in"), dpi=600, bg = "white" )
 ```
