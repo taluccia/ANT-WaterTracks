@@ -350,7 +350,7 @@ gt::gtsave(t3, filename = "../outputs/Tables/HGOnSurface.html")
 ```
 
 ```{r eval=FALSE, include=FALSE}
-gt::gtsave(t4, filename = "../outputs/Tables/HGOTSoilProfile.html")
+gt::gtsave(t4, filename = "../outputs/Tables/HGOnSoilProfile.html")
 ```
 
 
