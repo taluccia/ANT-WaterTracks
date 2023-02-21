@@ -9,6 +9,8 @@ output: html_document
 Here we explore the off and on track data for the water track at Howard Glacier. 
 
 
+For both, it’s Port 1 = 30 cm depth, 2 = 20 cm depth, 3 = 10 cm depth, and 4 = 0 cm. 
+
 # Packages
 ```{r}
 library(tidyverse)
@@ -537,7 +539,7 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
   )
 ```
 ### Subsurface 
-
+For both, it’s Port 1 = 30 cm depth, 2 = 20 cm depth, 3 = 10 cm depth, and 4 = 0 cm. 
 #### VWC
 ```{r}
 ( plot3 <- ggplot() + 
@@ -546,7 +548,7 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
       geom_line(data = meanOffsub, aes(x=date, y=vwc3, color="C")) +
       geom_line(data = meanOffsub, aes(x=date, y=vwc4, color="D")) +
   labs(x="Date", y=vwcUnits, caption = "Vertical profile off track") +
-    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="30 cm", "B"="20 cm", "C"="10 cm", "D"="0 cm")) +
   theme_reg
  )
 ```
@@ -554,12 +556,12 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
 
 ```{r}
 ( legend_sub <- ggplot() + 
-      geom_line(data = meanOffsub, aes(x=date, y=vwc1, color="A")) +
-      geom_line(data = meanOffsub, aes(x=date, y=vwc2, color="B")) +
-      geom_line(data = meanOffsub, aes(x=date, y=vwc3, color="C")) +
-      geom_line(data = meanOffsub, aes(x=date, y=vwc4, color="D")) +
+      geom_line(data = meanOffsub, aes(x=date, y=vwc4, color="A")) +
+    geom_line(data = meanOffsub, aes(x=date, y=vwc3, color="B")) +
+    geom_line(data = meanOffsub, aes(x=date, y=vwc2, color="C")) +
+    geom_line(data = meanOffsub, aes(x=date, y=vwc1, color="D")) +
   labs(x="Date", y=vwcUnits, caption = "Vertical profile off track") +
-    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+    scale_color_manual(values = c("A"="#bdc9e1", "B"="#67a9cf", "C"="#1c9099",  "D" = "#016c59"), labels =c("A"="0 cm",  "B"="10 cm" ,"C"="20 cm", "D" ="30 cm")) +
   theme_legend
  )
 ```
@@ -571,7 +573,7 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
       geom_line(data = meanOffsub, aes(x=date, y=temp3, color="C")) +
       geom_line(data = meanOffsub, aes(x=date, y=temp4, color="D")) +
   labs(x="Date", y=tempUnits, caption = "Vertical profile off track") +
-     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="30 cm", "B"="20 cm", "C"="10 cm", "D"="0 cm")) +
   theme_reg
  )
 ```
@@ -584,7 +586,7 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
       geom_line(data = meanOffsub, aes(x=date, y=ec3, color="C")) +
       geom_line(data = meanOffsub, aes(x=date, y=ec4, color="D")) +
   labs(x="Date", y=ecUnits, caption = "Vertical profile off track") +
-     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="30 cm", "B"="20 cm", "C"="10 cm", "D"="0 cm")) +
   theme_reg
  )
 ```
@@ -624,7 +626,7 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
       geom_line(data = meanOnsub, aes(x=date, y=vwc3, color="C")) +
       geom_line(data = meanOnsub, aes(x=date, y=vwc4, color="D")) +
   labs(x="Date", y=vwcUnits, caption = "Vertical profile on track") +
-    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+    scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="30 cm", "B"="20 cm", "C"="10 cm", "D"="0 cm")) +
   theme_reg
  )
 ```
@@ -638,7 +640,7 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
       geom_line(data = meanOnsub, aes(x=date, y=temp3, color="C")) +
       geom_line(data = meanOnsub, aes(x=date, y=temp4, color="D")) +
   labs(x="Date", y=tempUnits, caption = "Vertical profile on track") +
-     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="30 cm", "B"="20 cm", "C"="10 cm", "D"="0 cm")) +
   theme_reg
  )
 ```
@@ -651,7 +653,7 @@ scale_fill_manual(values = alpha(c("blue", "red"), .3))
       geom_line(data = meanOnsub, aes(x=date, y=ec3, color="C")) +
       geom_line(data = meanOnsub, aes(x=date, y=ec4, color="D")) +
   labs(x="Date", y=ecUnits, caption = "Vertical profile on track") +
-     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="0 cm", "B"="10 cm", "C"="20 cm", "D"="30 cm")) +
+     scale_color_manual(values = c("A" = "#016c59","B"="#1c9099", "C"="#67a9cf", "D"="#bdc9e1"), labels =c("A" ="30 cm", "B"="20 cm", "C"="10 cm", "D"="0 cm")) +
   theme_reg
  )
 ```
@@ -685,6 +687,10 @@ combineLegend <- cowplot::plot_grid(
 ggsave("../figures/SurfaceMeasures.tiff", plot = g1.1, width = 6, height =5, units = c("in"), dpi=600, bg = "white" )
 ```
 
+```{r eval=FALSE, include=FALSE}
+ggsave("../figures/SurfaceMeasures.jpg", plot = g1.1, width = 6, height =5, units = c("in"), dpi=600, bg = "white" )
+```
+
 ## Subsurface
 
 ```{r}
@@ -703,4 +709,11 @@ sub_leg = get_legend(legend_sub)
 
 ```{r eval=FALSE, include=FALSE}
 ggsave("../figures/VerticalProfileMeasures.tiff", plot = g2.1, width = 6, height =7, units = c("in"), dpi=600, bg = "white" )
+```
+
+```{r eval=FALSE, include=FALSE}
+ggsave("../figures/VerticalProfileMeasures.jpg", plot = g2.1, width = 6, height =7, units = c("in"), dpi=300, bg = "white" )
+```
+```{r eval=FALSE, include=FALSE}
+ggsave("../figures/VerticalProfileMeasuresSm.jpg", plot = g2.1, width = 6, height =5, units = c("in"), dpi=300, bg = "white" )
 ```
